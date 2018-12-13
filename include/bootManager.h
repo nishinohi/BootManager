@@ -35,6 +35,7 @@
 #define RESET 14
 
 #define POWER_KEY "powerKey"
+#define BOOT_MODE_KEY "bootModeKey" // 0 -> normal, 1 -> upload
 
 class BootManager {
   private:
@@ -46,13 +47,8 @@ class BootManager {
 
   public:
     BootManager() {
-        WiFi.mode(WIFI_AP);
-        WiFi.softAP("MultiUpload");
-        IPAddress myIP = WiFi.softAPIP();
-        DEBUG_MSG("AP IP address: ");
-        DEBUG_MSG_LN(myIP);
-        initPinMode();
         _powerPinNum = sizeof(_powerPins) / sizeof(uint8_t);
+        initPinMode();
         setupServer();
     };
 

@@ -39,7 +39,7 @@ function postAndDoAfter(postElements, callBack, url) {
 
 // 任意のGPIOのモジュールに電源を供給する
 function onPowerSupply() {
-    let powerPin = { powerPin: document.getElementById('powerPin').value };
+    let powerPin = { powerKey: document.getElementById('powerPin').value };
     postAndDoAfter(powerPin, null, onPowerSupply.name);
 }
 

@@ -23,8 +23,14 @@ void BootManager::onPowerSupply(AsyncWebServerRequest *request) {
         request->send(500);
         return;
     }
+    // 起動モード
+    String bootMode = request->arg(BOOT_MODE_KEY);
+    if (bootMode == NULL || bootMode.length() == 0) {
+        request->send(500);
+        return;
+    }
     powerSupplyModule(powerPin.toInt());
-    resetModule(true);
+    resetModule(bootMode.toInt() == 1 ? true : false);
     request->send(200);
 }
 
@@ -40,6 +46,7 @@ void BootManager::powerSupplyModule(uint8_t powerPin) {
 // uploadMode:true  -> upload mode
 void BootManager::resetModule(bool uploadMode) {
     DEBUG_MSG_LN("resetModule");
+    DEBUG_MSG_LN(uploadMode ? "upload mode" : "normal mode");
     digitalWrite(BOOT_MODE, uploadMode ? LOW : HIGH);
     delay(100);
     digitalWrite(RESET, LOW);
@@ -54,9 +61,9 @@ void BootManager::resetModule(bool uploadMode) {
 // ex) changePinState(0, true) -> POWER_0:HIGH, POWER_1～11:LOW
 void BootManager::changePinState(uint8_t powerPin, bool state) {
     DEBUG_MSG_LN("changePinState");
-    DEBUG_MSG_F("GPIO_%d:%d\n", _powerPins[powerPin], state);
     for (int ii = 0; ii < _powerPinNum; ++ii) {
         uint8_t output = ii == powerPin ? (state ? HIGH : LOW) : (state ? LOW : HIGH);
+        DEBUG_MSG_F("GPIO_%d:%d\n", _powerPins[ii], output);
         digitalWrite(_powerPins[ii], output);
     }
 }
