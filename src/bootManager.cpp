@@ -4,60 +4,42 @@
  * Server 設定
  */
 void BootManager::setupServer() {
-    _server.on("/onSearchModule", HTTP_POST,
-               std::bind(&BootManager::onSearchModule, this, std::placeholders::_1));
-    _server.on("/onUploadEnd", HTTP_GET,
-               std::bind(&BootManager::onUploadEnd, this, std::placeholders::_1));
-    _server.on("/onModuleShift", HTTP_GET,
-               std::bind(&BootManager::onModuleShift, this, std::placeholders::_1));
+    _server.on("/onPowerSupply", HTTP_POST,
+               std::bind(&BootManager::onPowerSupply, this, std::placeholders::_1));
     _server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
     _server.onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
 }
 
-void BootManager::onSearchModule(AsyncWebServerRequest *request) {
-    DEBUG_MSG_LN("onSearchModule");
+// 指定された GPIO に接続しているモジュールに電源を供給する
+void BootManager::onPowerSupply(AsyncWebServerRequest *request) {
+    DEBUG_MSG_LN("onPowerSupply");
     String powerPin = request->arg(POWER_KEY);
     if (powerPin == NULL || powerPin.length() == 0) {
         request->send(500);
         return;
     }
-    shitWakeupModule();
-    request->send(200);
-}
-
-void BootManager::onUploadEnd(AsyncWebServerRequest *request) {
-    DEBUG_MSG_LN("onUploadEnd");
+    // 利用可能な GPIO のピン番号以上のピンを指定された場合
+    if (powerPin.toInt() >= _powerPinNum) {
+        request->send(500);
+        return;
+    }
+    powerSupplyModule(powerPin.toInt());
     resetModule(true);
     request->send(200);
 }
 
-void BootManager::onModuleShift(AsyncWebServerRequest *request) {
-    DEBUG_MSG_LN("onModuleShift");
-    shitWakeupModule();
-    request->send(200);
+// 指定したピン番号のモジュールに電源を供給
+void BootManager::powerSupplyModule(uint8_t powerPin) {
+    DEBUG_MSG_LN("powerSupplyModule");
+    changePinState(powerPin, HIGH);
+    _currentSupplyPin = powerPin;
 }
 
-void BootManager::wakeupModule(uint8_t powerPin) {
-    DEBUG_MSG("wakeupModule");
-    DEBUG_MSG_LN(powerPin);
-    if (_moduleId != 0) {
-        digitalWrite(_powerPins[_moduleId - 1], HIGH);
-    }
-    digitalWrite(_powerPins[_moduleId], LOW);
-    ++_moduleId;
-}
-
-void BootManager::shitWakeupModule() {
-    DEBUG_MSG("shitWakeupModule");
-    DEBUG_MSG_LN(_moduleId);
-    if (_moduleId != 0) {
-        digitalWrite(_powerPins[_moduleId - 1], HIGH);
-    }
-    digitalWrite(_powerPins[_moduleId], LOW);
-    ++_moduleId;
-}
-
+// モジュールをリセット
+// uploadMode:false -> normal mode(default)
+// uploadMode:true  -> upload mode
 void BootManager::resetModule(bool uploadMode) {
+    DEBUG_MSG_LN("resetModule");
     digitalWrite(BOOT_MODE, uploadMode ? LOW : HIGH);
     delay(100);
     digitalWrite(RESET, LOW);
@@ -69,14 +51,19 @@ void BootManager::resetModule(bool uploadMode) {
 
 // 任意のピンの出力状態を HIGH or LOW にし
 // その他のピンの出力状態を反対にする
+// ex) changePinState(0, true) -> POWER_0:HIGH, POWER_1～11:LOW
 void BootManager::changePinState(uint8_t powerPin, bool state) {
+    DEBUG_MSG_LN("changePinState");
+    DEBUG_MSG_F("GPIO_%d:%d\n", _powerPins[powerPin], state);
     for (int ii = 0; ii < _powerPinNum; ++ii) {
         uint8_t output = ii == powerPin ? (state ? HIGH : LOW) : (state ? LOW : HIGH);
         digitalWrite(_powerPins[ii], output);
     }
 }
 
+// GPIO 初期化
 void BootManager::initPinMode() {
+    DEBUG_MSG_LN("initPinMode");
     // POWER PIN
     for (int ii = 0; ii < _powerPinNum; ++ii) {
         pinMode(_powerPins[ii], OUTPUT);
@@ -90,4 +77,7 @@ void BootManager::initPinMode() {
     // RESET
     pinMode(RESET, OUTPUT);
     digitalWrite(RESET, HIGH);
+    // LED
+    pinMode(LED, OUTPUT);
+    digitalWrite(LED, HIGH);
 }

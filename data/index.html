@@ -6,10 +6,38 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="bootManager.css">
+    <script type="text/javascript" src="bootManager.js"></script>
 </head>
 
 <body>
-    <hi>Hello</hi>
+    <div>
+        <div class="popup">
+            <div class="successBox">
+                <span class="popupText">Success</span>
+            </div>
+            <div class="failedBox">
+                <span class="popupText">Failed</span>
+            </div>
+        </div>
+        <div>
+            <h1>Debug Function</h1>
+            <select style="display: inline-block" id="powerPin">
+                <option value="0">POWER_0</option>
+                <option value="1">POWER_1</option>
+                <option value="2">POWER_2</option>
+                <option value="3">POWER_3</option>
+                <option value="4">POWER_4</option>
+                <option value="5">POWER_5</option>
+                <option value="6">POWER_6</option>
+                <option value="7">POWER_7</option>
+                <option value="8">POWER_8</option>
+                <option value="9">POWER_9</option>
+                <option value="10">POWER_10</option>
+                <option value="11">POWER_11</option>
+            </select>
+            <button id="powerSupplyButton" class="button" onclick="onPowerSupply()">ON</button>
+        </div>
 </body>
 
 </html>

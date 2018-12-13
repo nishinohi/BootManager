@@ -1,0 +1,156 @@
+body {
+    font-family: Meiryo;
+}
+
+h1 {
+    font-size: 1.2em;
+    padding: 0.5em;
+    color: #494949;
+    background: #edf8fc;
+    border-left: solid 5px #3d94ff;
+}
+
+#graph-container {
+    background-color: #ffffff;
+    border: 1px solid #b5b5b5;
+    height: 250px;
+    overflow: auto;
+    margin: 11px 0;
+}
+
+#container {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #ccc;
+}
+
+.button {
+    display: inline-block;
+    min-width: 100px;
+    width: auto;
+    height: 40px;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    background-color: #6090ff;
+    color: #fff;
+    margin: 5px;
+    font-weight: bold;
+}
+
+.button[disabled] {
+    background-color: rgb(162, 162, 162);
+}
+
+.button::before,
+.button::after {
+    position: absolute;
+    z-index: -1;
+    display: block;
+    content: '';
+}
+
+.button:hover {
+    background-color: #59b1eb;
+    cursor: pointer;
+}
+
+.button:hover[disabled] {
+    background-color: rgb(162, 162, 162);
+    cursor: pointer;
+}
+
+.config {
+    display: inline-block;
+}
+
+ul,
+ol {
+    color: #494949;
+    font-weight: bold;
+    background: #fcfcfc;
+    padding: 0.2em 0.2em 0.2em 2em;
+}
+
+ul li,
+ol li {
+    line-height: 1.1;
+    padding: 0.2em 0;
+}
+
+ul li ul li,
+ul li ol li {
+    font-weight: normal;
+    line-height: 1.1;
+    padding: 0.2em 0;
+}
+
+input[type=number], select {
+    width: 200px;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input.focused:invalid {  
+    border: 2px solid #ff2626;
+}
+
+/* for popup */
+.popup {
+    position: fixed;
+    width: 120px;
+    height: 40px;
+    margin-left: -80px;
+    margin-top: -40px;
+    top: 50%;
+    left: 50%;
+    border-radius: 5px;
+    display: inline-block;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    z-index: 2;
+}
+
+.popup .successBox {
+    width: inherit;
+    height: inherit;
+    border-radius: inherit;
+    opacity: 0;
+    display: table;
+    position: absolute;
+    background-color: #30a742;
+    transition: all 1800ms 0s ease;
+}
+
+.popup .failedBox {
+    width: inherit;
+    height: inherit;
+    border-radius: inherit;
+    opacity: 0;
+    position: absolute;
+    display: table;
+    background-color: #ff2626;
+    transition: all 1500ms 0s ease;
+}
+
+/* The actual popup */
+.popup .popupText {
+    display: table-cell;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Toggle this class - hide and show the popup */
+.popup .show {
+    opacity: 1;
+}

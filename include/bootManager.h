@@ -3,6 +3,7 @@
 
 #include "ESPAsyncWebServer.h"
 #include <SPIFFS.h>
+#include <vector>
 
 #define DEBUG_ESP_PORT Serial
 #ifdef DEBUG_ESP_PORT
@@ -38,29 +39,30 @@
 class BootManager {
   private:
     AsyncWebServer _server = AsyncWebServer(80);
-    uint8_t _currentModuleId = 0;
-    uint8_t _moduleNum = 0;
-    uint8_t _moduleId = 0;
+    uint8_t _currentSupplyPin = 0;
     uint8_t _powerPins[PIN_NUM] = {POWER_0, POWER_1, POWER_2, POWER_3, POWER_4,  POWER_5,
                                    POWER_6, POWER_7, POWER_8, POWER_9, POWER_10, POWER_11};
     uint8_t _powerPinNum = 0;
 
   public:
-    BootManager(uint8_t moduleNum) {
+    BootManager() {
+        WiFi.mode(WIFI_AP);
+        WiFi.softAP("MultiUpload");
+        IPAddress myIP = WiFi.softAPIP();
+        DEBUG_MSG("AP IP address: ");
+        DEBUG_MSG_LN(myIP);
         initPinMode();
-        _moduleNum = moduleNum;
-        setupServer();
         _powerPinNum = sizeof(_powerPins) / sizeof(uint8_t);
+        setupServer();
     };
 
     void startServer() { _server.begin(); }
-    void onSearchModule(AsyncWebServerRequest *request);
-    void onUploadEnd(AsyncWebServerRequest *request);
-    void onModuleShift(AsyncWebServerRequest *request);
+    // サーバー機能
+    void onPowerSupply(AsyncWebServerRequest *request);
     // モジュール起動管理
     void resetModule(bool uploadMode = false);
-    void wakeupModule(uint8_t powerPin);
-    void shitWakeupModule();
+    void powerSupplyModule(uint8_t powerPin);
+    void shitBootModule();
 
   private:
     void initPinMode();
